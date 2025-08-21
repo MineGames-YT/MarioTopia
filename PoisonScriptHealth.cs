@@ -1,0 +1,59 @@
+using UnityEngine;
+
+public class PoisonScriptHealth : MonoBehaviour
+{
+    public AudioSource poisonCollectSound;
+    public ParticleSystem ParticleCollect;
+    public GameObject Poison;
+
+    public GameObject Component1;
+    public GameObject Component2;
+    public GameObject Component3;
+    public BoxCollider collider;
+
+    public float MaxPoisonAlive;
+    public float PoisonAlive;
+    public bool isCollected;
+
+    private void Start()
+    {
+        PoisonAlive = MaxPoisonAlive;
+        isCollected = false;
+    }
+
+    private void Update()
+    {
+        if (isCollected)
+        {
+            PoisonAlive -= Time.deltaTime;
+
+            if (PoisonAlive <= 0)
+            {
+                Destroy(Poison);
+            }
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        // ���������, �������� �� ������ �������
+        if (other.CompareTag("Player"))
+        {
+            collider.enabled = false;
+
+            Component1.SetActive(false);
+            Component2.SetActive(false);
+            Component3.SetActive(false);
+            poisonCollectSound.Play();
+            ParticleCollect.Play();
+            isCollected = true;
+
+            InventoryMiniUI MiniInventory2 = other.GetComponent<InventoryMiniUI>();
+            MiniInventory2.Poison_HealthCurrent ++;
+            MiniInventory2.anim.Play("CurrentMiniInv");
+            
+            PlayerPrefs.SetInt("Poison_Health", +1);
+            PlayerPrefs.Save();
+        }
+    }
+}
